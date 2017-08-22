@@ -18,3 +18,12 @@ class IDatabase:
 
     @abstractmethod
     def reset(self): raise NotImplementedError
+
+    @abstractmethod
+    def display_data(self): raise NotImplementedError
+
+    @abstractmethod
+    def write_to_database(self, data): raise NotImplementedError
+
+    @abstractmethod
+    def backup_database(self): raise NotImplementedError

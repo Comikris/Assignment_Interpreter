@@ -21,3 +21,6 @@ class IFileHandler:
 
     @abstractmethod
     def validate_data(self, file): raise NotImplementedError
+
+    @abstractmethod
+    def pickle_all(self, data): raise NotImplementedError
