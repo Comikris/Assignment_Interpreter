@@ -20,7 +20,4 @@ class IFileHandler:
     def unpack_pickle(self, file): raise NotImplementedError
 
     @abstractmethod
-    def validate_data(self, file): raise NotImplementedError
-
-    @abstractmethod
     def pickle_all(self, data): raise NotImplementedError

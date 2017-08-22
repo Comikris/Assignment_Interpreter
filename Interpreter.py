@@ -12,7 +12,6 @@ class Interpreter(Cmd):
     def __init__(self):
         Cmd.__init__(self)
         self.file_handler = FileHandler()
-        self.active_data = None
         self.graph = Graph()
         self.graphs = []
         self.database = SQLDatabase()

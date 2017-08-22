@@ -15,3 +15,4 @@ class Controller:
 
         message = "### Thank you for using Interpreter.\n" \
                   "### Press any key to close"
+        self.view.say(message)

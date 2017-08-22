@@ -117,7 +117,3 @@ class Graph:
         self.colours = new_graph.colours
         self.labels = new_graph.labels
         self.angle = new_graph.angle
-
-    # temp function
-    def do_something(self):
-        print("doing something")
