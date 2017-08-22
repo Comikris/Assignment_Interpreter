@@ -37,13 +37,19 @@ class Interpreter(Cmd):
         if len(args) == 1:
             file_path = args[0]
             data = self.file_handler.load_file(file_path)
-            self.database.write_to_database(data)
+            if self.file_handler.validate_data(data):
+                self.database.write_to_database(data)
+            else:
+                print("Incorrect data.")
         elif len(args) == 2:
             file_path = args[1]
             optn = args[0]
             if "-d" in optn:
                 data = self.file_handler.load_file(file_path)
-                self.database.write_to_database(data)
+                if self.file_handler.validate_data(data):
+                    self.database.write_to_database(data)
+                else:
+                    print("Incorrect data.")
             elif "-g" in optn:
                 print("creating graph")
             else:

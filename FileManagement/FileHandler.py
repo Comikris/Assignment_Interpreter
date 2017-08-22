@@ -44,7 +44,7 @@ class FileHandler(IFileHandler):
     #
     def validate_data(self, data):
         print("put code validation here")
-        return data
+        return True
 
         # Brendan
         # FILE NAME AND PATH TO BE USER DEFINED IN LATER ITERATION
