@@ -1,7 +1,6 @@
 # ALL
 
 from cmd import *
-from Database.SQLDatabase import *
 from FileManagement.FileHandler import *
 from Graph import *
 
@@ -17,12 +16,6 @@ class Interpreter(Cmd):
         self.database = SQLDatabase()
 
     # Kris
-    def do_write_data(self, args):
-        convert = tuple(args.split(','))
-        data = [convert]
-        self.database.write_to_database(data)
-
-    # Kris
     # Pull data from database
     def do_display_data(self, args):
         self.database.display_data()
@@ -36,7 +29,7 @@ class Interpreter(Cmd):
         if len(args) == 1:
             file_path = args[0]
             data = self.file_handler.load_file(file_path)
-            if self.file_handler.validate_data(data):
+            if self.file_handler.validate(data):
                 self.database.write_to_database(data)
             else:
                 print("Incorrect data.")
@@ -45,7 +38,7 @@ class Interpreter(Cmd):
             optn = args[0]
             if "-d" in optn:
                 data = self.file_handler.load_file(file_path)
-                if self.file_handler.validate_data(data):
+                if self.file_handler.validate(data):
                     self.database.write_to_database(data)
                 else:
                     print("Incorrect data.")
@@ -58,8 +51,26 @@ class Interpreter(Cmd):
     # backup the database. This could be changed to use the pickle
     # function brendan makes soon
     def do_backup_database(self, args):
+        args = args.split(' ')
+        msg = ""
         data = self.database.backup_database()
-        self.file_handler.write_file(args, data)
+        can_create = True
+        if "-o" in args[0]:
+            if os.path.isfile(args[1]):
+                can_create = False
+                msg = "File already exists. Try a different filename."
+        else:
+            msg = "Incorrect option. Refer to help."
+            can_create = False
+
+        print(can_create)
+        if can_create:
+            if len(args) > 1:
+                self.file_handler.write_file(args[1], data)
+            else:
+                self.file_handler.write_file(args[0], data)
+        else:
+            print(msg)
 
     # Kris
     # This gets all data from the database
@@ -86,8 +97,8 @@ class Interpreter(Cmd):
                 argss.append(args[1][1])
             if len(argss) > 2 or len(argss) < 2:
                 raise TypeError
-            if argss[0] == 'pie' and argss[1] != 'gender' and argss[1] != 'bmi' \
-                    or argss[0] == 'bar' and argss[1] != 'salary-by-gender':
+            if argss[0] == 'pie' and argss[1] != 'gender' and argss[1] != 'bmi' and argss[1] != 'age' \
+                    or argss[0] == 'bar' and argss[1] != 'salary-by-gender' and argss[1] != 'salary-by-age':
                 raise ValueError
         except TypeError:
             print('This functions takes exactly one parameters')
@@ -103,14 +114,19 @@ class Interpreter(Cmd):
         else:
             self.graph.print_graph(my_graph)
 
+    # Brendan Holt
+    # Used to create a graph by calling collecting user defined arguments -
+    # and passing them to build_graph in the graph class
     def do_create_graph(self, args):
         try:
             args = getopt.getopt(args, "t:o:", ["graph-type=", "option="])
             argss = args[1].split()
+            # Raises exception if the incorrect amount of args have been entered
             if len(argss) > 2 or len(argss) < 2:
                 raise TypeError
-            if argss[0] == 'pie' and argss[1] != 'gender' and argss[1] != 'bmi' \
-                    or argss[0] == 'bar' and argss[1] != 'salary-by-gender':
+            # Raises exception if the args have been incorrectly typed
+            if argss[0] == 'pie' and argss[1] != 'gender' and argss[1] != 'bmi' and argss[1] != 'age' \
+                    or argss[0] == 'bar' and argss[1] != 'salary-by-gender' and argss[1] != 'salary-by-age':
                 raise ValueError
         except TypeError:
             print('This functions takes exactly two parameters')
@@ -121,25 +137,61 @@ class Interpreter(Cmd):
         # new graph is temp and is created to be appended to the graph list then destroyed
         self.graphs.append(self.graph.build_graph(argss))
 
+    # Brendan Holt
+    # User called function to list graphs currenltly loaded in the interpreters graph list
     def do_list_graphs(self, args):
+        try:
+            args = getopt.getopt(args, "t:o:", ["graph-type="])
+            argss = args[1].split()
+            # If there are arguments
+            if len(argss) > 0:
+                # Raises exception if the incorrect amount of args have been entered
+                if len(argss) > 1 or len(argss) < 0:
+                    raise TypeError
+                # Raises exception if the args have been incorrectly typed
+                if argss[0] != 'pie' and argss[0] != 'bar':
+                    raise ValueError
+            # Raises exception should there be no graphs inside the iterators graph list
+            if len(self.graphs) == 0:
+                raise IndexError
+        except TypeError:
+            print('This functions takes exactly one or no parameters')
+            return
+        except ValueError:
+            print('Ensure Parameters are correctly spelt')
+            return
+        except IndexError:
+            print('There are currently no graphs loaded')
+            return
+        if len(argss) > 0:
+            print(argss[0])
         for g in range(len(self.graphs)):
             # NEW Brendan changed self.graph[0].data to self.graph[g].title
-            print(g, self.graphs[g].title)
-        selection = input("Select graph number to display graph or press enter to continue >>> ")
-        if self.graphs[int(selection)] in self.graphs:
-            self.graph.print_graph(self.graphs[int(selection)])
-        else:
-            print('Selection invalid')
+            # Checks args length for type of graph user selects
+            if len(argss) > 0:
+                if argss[0] == self.graphs[g].type:
+                    print(g, self.graphs[g].title + " " + self.graphs[g].time)
+            # If not args are found the graph is listed to the output without regardless of type
+            else:
+                print(g, self.graphs[g].title + " " + self.graphs[g].time)
+
+        while True:
+            selection = input("Select graph number to display graph or press enter to continue >>> ")
+            try:
+                if selection == "":
+                    return
+                elif int(selection) not in range(len(self.graphs)):
+                    raise ValueError
+            except ValueError:
+                print('Graph selection is outside of range')
+                continue
+            break
+
+        self.graph.print_graph(self.graphs[int(selection)])
 
     # Brendan Holt
-    # write actual unpack code in the FileHandler class
-    # args being file name e.g. pickle_pack file.pickle
-    # save all graphs
-    # def do_save_graphs(self, args):
-        # for g in self.graph:
-            # self.file_handler.pack_pickle(g, g.file)
-
-    # FILEPATH TO BE USER DEFINED USING ARGS IN LATER ITERATION
+    # Pickles the currently loaded graphs in the list self.graph by calling the file handlers pack_pickle
+    # Args is currently not used but kept to implement user defined files should the need arise
     def do_save_graphs(self, args):
         try:
             if len(self.graphs) < 1:
@@ -150,19 +202,20 @@ class Interpreter(Cmd):
         self.file_handler.pack_pickle(self.graphs)
 
     # Brendan Holt
-    # write actual unpack code in the FileHandler class
-    # args being filename e.g. pickle_unpack
+    # Unpickles the default pickle file (see unpack_pickle in the file handler) to the graphs list
+    # Args is currently not used but kept to implement user defined files should the need arise
     def do_load_graphs(self, args):
-        # FILEPATH TO BE USER DEFINED USING ARGS IN LATER ITERATION
+        # Should the file not exist an exception is raised in the file handler
         filepath = os.path.dirname(os.path.realpath(sys.argv[0])) + "\\files\\pickle.dat"
         # Ensure graph list is cleared
         self.graphs = []
-        # reload graph list
+        # Reload graph list
         self.graphs = self.file_handler.unpack_pickle(filepath)
 
-    # NEW Brendan Holt
+    # Brendan Holt
     # Pickles and backs up the entire database
-    def do_pickle(self):
+    # Args is currently not used but kept to implement user defined files should the need arise
+    def do_pickle(self, args):
         data = self.database.backup_database()
         print('The above has been pickled to a backup file')
         self.file_handler.pickle_all(data)
@@ -172,10 +225,81 @@ class Interpreter(Cmd):
     # Following this format: help_function
     # e.g. help_write_data(self):
     # for info on what each function does, check out the help.doc file
-    def help_write_data(self):
-        # Example for Kate
-        print("help on write data")
+    def do_about(args):
+        """
+        This about command shows user some information about this application
+        """
 
-    #
+        print("Welcome to Interterpreter \n" +
+              " This application able to read, store and display data \n" +
+              "in a given format \n")
+
+    def help_display_data(self):
+        print("Display data is a simple command that shows all "
+              "the data from the database in text form.\n" +
+              "USAGE: display_data\n" +
+              "OPTIONS and ARGUMENTS: This command takes no options or arguments.")
+
+    def help_load_from_file(self):
+        print("Load data from a file and save it to the database.\n" +
+              "USAGE: load_from_file -option filepath\n" +
+              "OPTIONS:\n" +
+              "   -g: Create a graph with the data\n" +
+              "   -d: Save data to the database. This is the default option.\n" +
+              "ARGUMENTS:\n" +
+              "   filepath: Supply a filename or file path to the file that you want to load.")
+
+    def help_backup_database(self):
+        print("This command saves data to a file.\n" +
+              "USAGE: backup_database -option filepath\n" +
+              "OPTIONS:\n" +
+              "   -o: Overwrite existing file\n" +
+              "ARGUMENTS:\n" +
+              "   filepath: Supply a filename or file path to where you want to save the database.")
+
+    def help_create_graph(self):
+        print("Create a bar or pie graph that visually represents data.\n" +
+              "USAGE: create_graph <chart-type> <data>\n" +
+              "OPTIONS: this command takes no options.\n" +
+              "ARGUMENTS:\n" +
+              "   chart-type: the type of graph you want to create. Can be 'pie' or 'graph'\n" +
+              "   data: the data you want to show. For 'pie' "
+              "it can be 'gender, bmi or age', for 'bar' it can be 'salary-by-gender'")
+
+    def help_display_graph(self):
+        print("Create a bar or pie graph that visually represents data.\n" +
+              "USAGE: display_graph <chart-type> <data>\n" +
+              "OPTIONS: this command takes no options.\n" +
+              "ARGUMENTS:\n" +
+              "   chart-type: the type of graph you want to create. Can be 'pie' or 'graph'\n" +
+              "   data: the data you want to show. For 'pie'"
+              " it can be 'gender, bmi or age', for 'bar' it can be 'salary-by-gender'")
+
+    def help_list_graphs(self):
+        print("Display a list of graphs. Use this if you need to load a specific "
+              "graph that is active in the system.\n" +
+              "USAGE: list_graphs <graph-type>\n" +
+              "OPTIONS: This function takes no options.\n" +
+              "ARGUMENTS:\n" +
+              "   graph-type: Supply the type of graph you want to list. Can be 'pie' or 'bar'.")
+
+    def help_load_graphs(self):
+        print("Load graphs that have been saved.\n" +
+              "USAGE: load_graphs\n" +
+              "OPTIONS: This function takes no options.\n" +
+              "ARGUMENTS:This function takes no arguments\n")
+
+    def help_save_graphs(self):
+        print("Save existing graphs to a file so they can be loaded again.\n" +
+              "USAGE: save_graphs\n" +
+              "OPTIONS: This function takes no options.\n" +
+              "ARGUMENTS:This function takes no arguments\n")
+
+    def help_pickle(self):
+        print("Encrypt database\n" +
+              "USAGE: pickle\n" +
+              "OPTIONS: This function takes no options.\n" +
+              "ARGUMENTS:This function takes no arguments\n")
+
     def emptyline(self):
         pass

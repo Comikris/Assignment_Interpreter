@@ -11,7 +11,7 @@ class IFileHandler:
     def write_file(self, file, data): raise NotImplementedError
 
     @abstractmethod
-    def validate_data(self, data): raise NotImplementedError
+    def validate(self, data): raise NotImplementedError
 
     @abstractmethod
     def pack_pickle(self, graphs): raise NotImplementedError
@@ -21,3 +21,9 @@ class IFileHandler:
 
     @abstractmethod
     def pickle_all(self, data): raise NotImplementedError
+
+    @abstractmethod
+    def valid_date(self, data): raise NotImplementedError
+
+    @abstractmethod
+    def valid_age(self, data): raise NotImplementedError
