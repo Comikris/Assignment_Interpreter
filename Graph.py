@@ -1,3 +1,5 @@
+# KRIS LITTLE
+
 from Database.SQLDatabase import *
 import matplotlib.pyplot as plt
 import getopt

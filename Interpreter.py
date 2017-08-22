@@ -1,3 +1,5 @@
+# ALL
+
 from cmd import *
 from Database.SQLDatabase import *
 from FileManagement.FileHandler import *
@@ -6,6 +8,7 @@ from Graph import *
 
 class Interpreter(Cmd):
 
+    # Kris
     def __init__(self):
         Cmd.__init__(self)
         self.file_handler = FileHandler()
@@ -14,6 +17,7 @@ class Interpreter(Cmd):
         self.graphs = []
         self.database = SQLDatabase()
 
+    # Kris
     def do_write_data(self, args):
         convert = tuple(args.split(','))
         data = [convert]
