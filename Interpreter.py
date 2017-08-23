@@ -29,19 +29,17 @@ class Interpreter(Cmd):
         if len(args) == 1:
             file_path = args[0]
             data = self.file_handler.load_file(file_path)
-            if self.file_handler.validate(data):
-                self.database.write_to_database(data)
-            else:
-                print("Incorrect data.")
+            data_to_add = self.file_handler.validate(data)
+            print("adding data")
+            print(data_to_add)
+            self.database.write_to_database(data_to_add)
         elif len(args) == 2:
             file_path = args[1]
             optn = args[0]
             if "-d" in optn:
                 data = self.file_handler.load_file(file_path)
-                if self.file_handler.validate(data):
-                    self.database.write_to_database(data)
-                else:
-                    print("Incorrect data.")
+                data_to_add = self.file_handler.validate(data)
+                self.database.write_to_database(data_to_add)
             elif "-g" in optn:
                 print("creating graph")
             else:
