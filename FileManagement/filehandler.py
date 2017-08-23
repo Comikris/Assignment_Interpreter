@@ -1,21 +1,21 @@
-from IFileHandler import *
+from FileManagement.interface_filehandler import *
 # Brendan
 import pickle
 import os
-import sys
 
-#kate
+# kate
 import re
 from datetime import *
 
 
+# Kris Little design
 class FileHandler(IFileHandler):
     def __init__(self):
         self.valid = True
 
+    # Kris
     def load_file(self, file):
         # put error handling here
-        print("Loading file...")
         contents = []
         try:
             the_file = open(file, 'r')
@@ -25,10 +25,10 @@ class FileHandler(IFileHandler):
             for line in the_file:
                 line = tuple(line.replace('\n', "").split(','))
                 contents.append(line)
-            print(contents)
             the_file.close()
             return contents
 
+    # Kris
     def write_file(self, file, data):
         the_file = open(file, 'w')
         string = ""
@@ -69,10 +69,10 @@ class FileHandler(IFileHandler):
 
     def valid_age(self, birthday):
         today = date.today()
-        myDate = birthday
-        print(myDate)
+        mydate = birthday
+        print(mydate)
         try:
-            born = datetime.strptime(myDate, '%d%m%Y')
+            born = datetime.strptime(mydate, '%d%m%Y')
         except ValueError:
             print("ntng")
             pass
@@ -96,6 +96,8 @@ class FileHandler(IFileHandler):
 
         """
         add_to = []
+        add_to = data
+        return add_to
         for person in data:
             self.valid = True
             print(person)
@@ -122,14 +124,14 @@ class FileHandler(IFileHandler):
                 print(person[2])
             elif person[2] != self.valid_age(person[6]):
                 print("Does not match with your birthday, invalid age")
-                #self.valid = False
+                # self.valid = False
             else:
                 print(person[2] + " " + 'age must be an integer')
-                #self.valid = False
+                # self.valid = False
 
             # check sales is 3 interger value
             if re.match(r'[0-9]{3}', person[3]):
-                print (person[3])
+                print(person[3])
             else:
                 print(person[3] + " " + 'is incorrect sales number, '
                                         'must be a 2 interger number')
@@ -158,13 +160,12 @@ class FileHandler(IFileHandler):
             else:
                 print(person[2] + " " + 'is incorrect date format, '
                                         'must contain DD-MM-YYYY or DD-MM-YY and seperated by -')
-                self.valid = False
+                # self.valid = False
 
             if self.valid:
                 add_to.append(person)
             
         return add_to
-        
 
     # Brendan Holt
     # Used to pickle the loaded graphs to default pickle file

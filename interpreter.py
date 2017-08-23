@@ -1,19 +1,20 @@
-# ALL
+# all of us
 
 from cmd import *
-from FileManagement.FileHandler import *
-from Graph import *
+from Database import sql_database
+from FileManagement.filehandler import *
+from graph import *
 
 
 class Interpreter(Cmd):
 
     # Kris
-    def __init__(self):
+    def __init__(self, database_name):
         Cmd.__init__(self)
         self.file_handler = FileHandler()
         self.graph = Graph()
         self.graphs = []
-        self.database = SQLDatabase()
+        self.database = sql_database.SQLDatabase(database_name)
 
     # Kris
     # Pull data from database
@@ -24,8 +25,6 @@ class Interpreter(Cmd):
     # - This function loads and saves data to the database
     def do_load_from_file(self, args):
         args = args.split(' ')
-        file_path = ""
-        optn = ""
         if len(args) == 1:
             file_path = args[0]
             data = self.file_handler.load_file(file_path)
@@ -223,7 +222,7 @@ class Interpreter(Cmd):
     # Following this format: help_function
     # e.g. help_write_data(self):
     # for info on what each function does, check out the help.doc file
-    def do_about(args):
+    def do_about(self, args):
         """
         This about command shows user some information about this application
         """

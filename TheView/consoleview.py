@@ -1,4 +1,6 @@
-from TheView.IVIew import *
+# by Kris
+
+from TheView.interface_view import *
 
 
 class ConsoleView(IView):

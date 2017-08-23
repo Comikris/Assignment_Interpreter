@@ -1,8 +1,10 @@
-from Database.SQLDatabase import *
+from Database.sql_database import *
 import matplotlib.pyplot as plt
 import getopt
 import time
 
+
+# design kris, coded by Brendan
 
 class Graph:
 
