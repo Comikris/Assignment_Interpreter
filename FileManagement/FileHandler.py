@@ -1,5 +1,4 @@
-from FileManagement.IFileHandler import *
-
+from IFileHandler import *
 # Brendan
 import pickle
 import os
@@ -48,34 +47,38 @@ class FileHandler(IFileHandler):
     # validate input for date type
     # KATE
     def valid_date(self, birthday):
-        minyear = 1918
+        minyear = 1000
         maxyear = date.today().year
 
         mydate = birthday.split('-')
-        birthdate = mydate[0]
-        birthmonth = mydate[1]
-        birthyear = mydate[2]
-
-        if int(birthyear) > maxyear or int(birthyear) < minyear:
-            birthdayobj = date(int(birthdate), int(birthmonth), int(birthyear))
-            return True
-        else:
-            print('Year is out of range')
+        if len(mydate) == 3:
+            birthdate = mydate[0]
+            birthmonth = mydate[1]
+            birthyear = mydate[2]
+            print(birthyear)
+            
+            if int(birthyear) > maxyear or int(birthyear) < minyear:
+                print(mydate)
+                birthdayobj = date(birthdate, birthmonth, birthyear)
+                return True
+            else:
+                print('Year is out of range')
 
     # Validate date match year
     # KATE
 
     def valid_age(self, birthday):
         today = date.today()
-        mydate = birthday.split('-')
-        print("DATE:")
-        print(mydate)
-        birthdate = int(mydate[0])
-        birthmonth = int(mydate[1])
-        birthyear = int(mydate[2])
-        age = today.year - birthyear \
-            - ((today.month, today.day) < (birthmonth, birthdate))
-        return age
+        myDate = birthday
+        print(myDate)
+        try:
+            born = datetime.strptime(myDate, '%d%m%Y')
+        except ValueError:
+            print("ntng")
+            pass
+        else:
+            age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+            return age
 
     # Validate file data
 
@@ -92,11 +95,12 @@ class FileHandler(IFileHandler):
         invalidate data: 12-06-1998
 
         """
-
+        add_to = []
         for person in data:
             self.valid = True
+            print(person)
             # check the format is a letter and 3 digit e.g A002 or a002
-            if re.match(r'[a-z][0-9]', (person[0]).lower()):
+            if re.match(r'[a-z][0-9]{3}', (person[0]).lower()):
                 print(person[0])
             else:
                 print(person[0] + " " + 'is incorrect ID, '
@@ -118,14 +122,14 @@ class FileHandler(IFileHandler):
                 print(person[2])
             elif person[2] != self.valid_age(person[6]):
                 print("Does not match with your birthday, invalid age")
-                self.valid = False
+                #self.valid = False
             else:
                 print(person[2] + " " + 'age must be an integer')
-                self.valid = False
+                #self.valid = False
 
             # check sales is 3 interger value
-            if re.match(r'[0-9]', person[3]):
-                return (person[3])
+            if re.match(r'[0-9]{3}', person[3]):
+                print (person[3])
             else:
                 print(person[3] + " " + 'is incorrect sales number, '
                                         'must be a 2 interger number')
@@ -141,7 +145,7 @@ class FileHandler(IFileHandler):
 
             # check Income is float
 
-            if re.match(r'[0-9]{2,3}', person[5]):
+            if re.match(r'\d[0-9]{2,3}', person[5]):
                 print(person[5])
             else:
                 print(person[5] + " " + 'is incorrect income, '
@@ -156,10 +160,11 @@ class FileHandler(IFileHandler):
                                         'must contain DD-MM-YYYY or DD-MM-YY and seperated by -')
                 self.valid = False
 
-            if not self.valid:
-                break
-
-        return self.valid
+            if self.valid:
+                add_to.append(person)
+            
+        return add_to
+        
 
     # Brendan Holt
     # Used to pickle the loaded graphs to default pickle file
