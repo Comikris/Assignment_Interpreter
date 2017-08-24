@@ -4,6 +4,7 @@ from cmd import *
 from Database import sql_database
 from FileManagement.filehandler import *
 from graph import *
+import sys
 
 
 class Interpreter(Cmd):
@@ -12,9 +13,9 @@ class Interpreter(Cmd):
     def __init__(self, database_name):
         Cmd.__init__(self)
         self.file_handler = FileHandler()
-        self.graph = Graph()
-        self.graphs = []
         self.database = sql_database.SQLDatabase(database_name)
+        self.graph = Graph(self.database)
+        self.graphs = []
 
     # Kris
     # Pull data from database

@@ -1,4 +1,3 @@
-from Database.sql_database import *
 import matplotlib.pyplot as plt
 import getopt
 import time
@@ -8,8 +7,9 @@ import time
 
 class Graph:
 
-    def __init__(self):
+    def __init__(self, database):
         self.data1 = None
+        self.database = database
         # NEW Brendan
         self.data2 = None
         self.data3 = None
@@ -55,8 +55,7 @@ class Graph:
 
     # Brendan Holt
     # Builds a graph, called from create_graph in the interpreter
-    @staticmethod
-    def build_graph(args):
+    def build_graph(self, args):
         try:
             argss = []
             args = getopt.getopt(args, "t:o:", ["graph-type=", "option="])
@@ -76,8 +75,8 @@ class Graph:
         except ValueError:
             print('Ensure Graph Value Option Parameter is correctly spelt')
             return
-        database = SQLDatabase()
-        new_graph = Graph()
+        database = self.database
+        new_graph = Graph(database)
 
         # Nested Function to shorten code required to build graphdata
         def append_sql(sql):

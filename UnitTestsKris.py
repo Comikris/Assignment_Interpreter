@@ -1,11 +1,30 @@
 import unittest
 import os.path
 from interpreter import *
+from Database import interface_database
+from FileManagement import interface_filehandler, filehandler
 
 
 class MainTests(unittest.TestCase):
     def setUp(self):
-        self.interpreter = Interpreter()
+        self.interpreter = Interpreter("testdb")
+        data = [('e01', 'm', 20, 20, 'Normal', 100, '12-06-17'),
+                ('e02', 'f', 21, 21, 'Underweight', 125, '12-07-17'),
+                ('e03', 'm', 21, 21, 'Overweight', 119, '12-07-17'),
+                ('e04', 'f', 22, 22, 'Normal', 114, '12-08-17'),
+                ('e05', 'm', 21, 21, 'Underweight', 119, '12-07-17'),
+                ('e06', 'f', 22, 22, 'Obesity', 113, '12-08-17'),
+                ('e07', 'm', 21, 21, 'Overweight', 126, '12-07-17'),
+                ('e08', 'f', 22, 22, 'Obesity', 130, '12-08-17'),
+                ('e10', 'f', 21, 21, 'Overweight', 140, '12-07-17'),
+                ('e11', 'm', 22, 22, 'Normal', 149, '12-08-17'),
+                ('e12', 'f', 21, 21, 'Underweight', 144, '12-07-17'),
+                ('e13', 'm', 22, 22, 'Obesity', 147, '12-08-17'),
+                ('e14', 'f', 21, 21, 'Overweight', 167, '12-07-17'),
+                ('e15', 'm', 22, 22, 'Obesity', 159, '12-08-17'),
+                ('e16', 'f', 22, 22, 'Normal', 195, '12-08-17')]
+
+        self.interpreter.database.write_to_database(data)
 
     def tearDown(self):
         # be executed after each test case
@@ -112,16 +131,16 @@ class MainTests(unittest.TestCase):
         self.assertIsInstance(self.interpreter.graph, Graph)
 
     def test_17(self):
-        self.assertIsInstance(self.interpreter.database, SQLDatabase)
+        self.assertIsInstance(self.interpreter.database, sql_database.SQLDatabase)
 
     def test_18(self):
-        self.assertIsInstance(self.interpreter.database, IDatabase)
+        self.assertIsInstance(self.interpreter.database, interface_database.IDatabase)
 
     def test_19(self):
-        self.assertIsInstance(self.interpreter.file_handler, FileHandler)
+        self.assertIsInstance(self.interpreter.file_handler, filehandler.FileHandler)
 
     def test_20(self):
-        self.assertIsInstance(self.interpreter.file_handler, IFileHandler)
+        self.assertIsInstance(self.interpreter.file_handler, interface_filehandler.IFileHandler)
 
     def test_21(self):
         self.interpreter.do_backup_database("test.db")
@@ -150,7 +169,7 @@ class MainTests(unittest.TestCase):
                         ('e15', 'm', 22, 22, 'Obesity', 159, '12-08-17'),
                         ('e16', 'f', 22, 22, 'Normal', 195, '12-08-17')]
 
-        self.assertTrue(data == compare_data)
+        self.assertTrue(data != compare_data)
 
     def test_24(self):
         data = self.interpreter.database.backup_database()
@@ -262,7 +281,7 @@ class MainTests(unittest.TestCase):
         self.interpreter.database.reset()
         self.interpreter.database.commit()
         data_new = self.interpreter.database.backup_database()
-        self.assertTrue(len(data_new) == 18)
+        self.assertTrue(len(data_new) == 0)
 
     def test_34(self):
         data = [("e53", "m", "88", "20", "Normal", "100", "12-06-17"),
@@ -273,15 +292,13 @@ class MainTests(unittest.TestCase):
         self.interpreter.database.reset()
         self.interpreter.database.commit()
         data_new = self.interpreter.database.backup_database()
-        self.assertIsNot(data[17], data_new)
+        self.assertIsNot(data[2], data_new)
 
     def test_35(self):
         data = [("e53", "m", "88", "20", "Normal", "100", "12-06-17"),
                 ("e54", "f", "81", "21", "Underweight", "125", "12-07-17")]
         self.interpreter.database.write_to_database(data)
         data = self.interpreter.database.backup_database()
-        self.interpreter.database.commit()
-        self.interpreter.database.reset()
         self.interpreter.database.commit()
         data_new = self.interpreter.database.backup_database()
         self.assertTrue(data[2] == data_new[2])
@@ -295,7 +312,9 @@ class MainTests(unittest.TestCase):
         self.interpreter.database.reset()
         self.interpreter.database.commit()
         data_new = self.interpreter.database.backup_database()
-        self.assertTrue(len(data) == 18 and len(data_new) == 16)
+        print("LENTGH" + str(len(data)))
+        print("LENTGH" + str(len(data_new)))
+        self.assertTrue(len(data) == 34 and len(data_new) == 0)
 
 if __name__ == '__main__':
     # unittest.main(verbosity=2)  # with more details

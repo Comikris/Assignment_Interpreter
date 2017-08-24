@@ -1,7 +1,6 @@
 # KRIS LITTLE
 
 import sqlite3
-import os
 
 from Database.interface_database import *
 
