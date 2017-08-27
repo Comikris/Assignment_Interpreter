@@ -223,7 +223,8 @@ class Interpreter(Cmd):
     # Following this format: help_function
     # e.g. help_write_data(self):
     # for info on what each function does, check out the help.doc file
-    def do_about(self, args):
+    @staticmethod
+    def do_about(args):
         """
         This about command shows user some information about this application
         """
@@ -232,13 +233,15 @@ class Interpreter(Cmd):
               " This application able to read, store and display data \n" +
               "in a given format \n")
 
-    def help_display_data(self):
+    @staticmethod
+    def help_display_data():
         print("Display data is a simple command that shows all "
               "the data from the database in text form.\n" +
               "USAGE: display_data\n" +
               "OPTIONS and ARGUMENTS: This command takes no options or arguments.")
 
-    def help_load_from_file(self):
+    @staticmethod
+    def help_load_from_file():
         print("Load data from a file and save it to the database.\n" +
               "USAGE: load_from_file -option filepath\n" +
               "OPTIONS:\n" +
@@ -247,7 +250,8 @@ class Interpreter(Cmd):
               "ARGUMENTS:\n" +
               "   filepath: Supply a filename or file path to the file that you want to load.")
 
-    def help_backup_database(self):
+    @staticmethod
+    def help_backup_database():
         print("This command saves data to a file.\n" +
               "USAGE: backup_database -option filepath\n" +
               "OPTIONS:\n" +
@@ -255,7 +259,8 @@ class Interpreter(Cmd):
               "ARGUMENTS:\n" +
               "   filepath: Supply a filename or file path to where you want to save the database.")
 
-    def help_create_graph(self):
+    @staticmethod
+    def help_create_graph():
         print("Create a bar or pie graph that visually represents data.\n" +
               "USAGE: create_graph <chart-type> <data>\n" +
               "OPTIONS: this command takes no options.\n" +
@@ -264,7 +269,8 @@ class Interpreter(Cmd):
               "   data: the data you want to show. For 'pie' "
               "it can be 'gender, bmi or age', for 'bar' it can be 'salary-by-gender'")
 
-    def help_display_graph(self):
+    @staticmethod
+    def help_display_graph():
         print("Create a bar or pie graph that visually represents data.\n" +
               "USAGE: display_graph <chart-type> <data>\n" +
               "OPTIONS: this command takes no options.\n" +
@@ -273,7 +279,8 @@ class Interpreter(Cmd):
               "   data: the data you want to show. For 'pie'"
               " it can be 'gender, bmi or age', for 'bar' it can be 'salary-by-gender'")
 
-    def help_list_graphs(self):
+    @staticmethod
+    def help_list_graphs():
         print("Display a list of graphs. Use this if you need to load a specific "
               "graph that is active in the system.\n" +
               "USAGE: list_graphs <graph-type>\n" +
@@ -281,19 +288,22 @@ class Interpreter(Cmd):
               "ARGUMENTS:\n" +
               "   graph-type: Supply the type of graph you want to list. Can be 'pie' or 'bar'.")
 
-    def help_load_graphs(self):
+    @staticmethod
+    def help_load_graphs():
         print("Load graphs that have been saved.\n" +
               "USAGE: load_graphs\n" +
               "OPTIONS: This function takes no options.\n" +
               "ARGUMENTS:This function takes no arguments\n")
 
-    def help_save_graphs(self):
+    @staticmethod
+    def help_save_graphs():
         print("Save existing graphs to a file so they can be loaded again.\n" +
               "USAGE: save_graphs\n" +
               "OPTIONS: This function takes no options.\n" +
               "ARGUMENTS:This function takes no arguments\n")
 
-    def help_pickle(self):
+    @staticmethod
+    def help_pickle():
         print("Encrypt database\n" +
               "USAGE: pickle\n" +
               "OPTIONS: This function takes no options.\n" +

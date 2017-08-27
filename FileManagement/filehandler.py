@@ -3,6 +3,7 @@ from FileManagement.interface_filehandler import *
 import pickle
 import os
 import sys
+import math
 # kate
 import re
 from datetime import *
@@ -56,7 +57,7 @@ class FileHandler(IFileHandler):
             birthmonth = mydate[1]
             birthyear = mydate[2]
             print(birthyear)
-            
+
             if int(birthyear) > maxyear or int(birthyear) < minyear:
                 print(mydate)
                 birthdayobj = date(birthdate, birthmonth, birthyear)
@@ -74,7 +75,6 @@ class FileHandler(IFileHandler):
         try:
             born = datetime.strptime(mydate, '%d%m%Y')
         except ValueError:
-            print("ntng")
             pass
         else:
             age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
@@ -96,75 +96,85 @@ class FileHandler(IFileHandler):
 
         """
         add_to = []
-        add_to = data
-        return add_to
+        feedback = ""
         for person in data:
+            feedback += "Feedback for data at: " + str(data.index(person) + 1) + "\n"
+
             self.valid = True
             print(person)
             # check the format is a letter and 3 digit e.g A002 or a002
             if re.match(r'[a-z][0-9]{3}', (person[0]).lower()):
-                print(person[0])
+                # Kris
+                if len(str(person[0])) >= 5:
+                    self.valid = False
             else:
-                print(person[0] + " " + 'is incorrect ID, '
-                                        ' must contains a letter and 3 digits e.g a02')
+                # Kris
+                feedback += "ID is incorrect; must contain a letter and 3 digits e.g. a001.\n"
                 self.valid = False
 
             # check the format is either M/F/Male/Female
 
-            if person[1].upper() == "M" or (person[1]).upper() == "F" or person[1] == "Male" or person[1] == "Female":
+            if person[1].upper() == "M" or (person[1]).upper() == "F":
                 print(person[1])
             else:
-                print(person[1] + " " + 'is incorrect Gender, '
-                                        ' must either be M and Male or F and Female')
+                # Kris
+                feedback += "Incorect Gender; must be M or F.\n"
                 self.valid = False
 
-            # check age is valid entry and match with date
+            # CHECK DATE, THEN CHECK AGE..
+            # Kris
+            date_correct = True
+            try:
+                datetime.strptime(person[6], "%d-%m-%Y")
+            except ValueError:
+                date_correct = False
+                feedback += "Date is not corrent format! " + str(person[6])
+                self.valid = False
 
-            if re.match(r'[0-9]{2}', person[2]) and person[2] == self.valid_age(person[6]):
-                print(person[2])
-            elif person[2] != self.valid_age(person[6]):
-                print("Does not match with your birthday, invalid age")
-                # self.valid = False
-            else:
-                print(person[2] + " " + 'age must be an integer')
-                # self.valid = False
+            if date_correct:
+                the_date = datetime.strptime(person[6], "%d-%m-%Y")
+                test_age = math.floor(((datetime.today() - the_date).days/365))
+                if test_age == int(person[2]):
+                    pass
+                else:
+                    self.valid = False
+                    feedback += "Age and birthday does not match. " + str(test_age) + ":" + str(int(person[2]))
 
             # check sales is 3 interger value
             if re.match(r'[0-9]{3}', person[3]):
                 print(person[3])
             else:
-                print(person[3] + " " + 'is incorrect sales number, '
-                                        'must be a 2 interger number')
+                feedback += "Incorrect sales number; must be a 3 digit whole number. \n"
                 self.valid = False
 
             # check BMI is either Normal / Overweight / Obesity or Underweight
             if re.match(r'\b(NORMAL|OVERWEIGHT|OBESITY|UNDERWEIGHT)\b', (person[4]).upper()):
                 print(person[4])
             else:
-                print(person[4] + " " ' is incorrect BMI value, '
-                                  'must select from Normal, Overweight, Obesity or Underweight')
+                feedback += "Incorrect BMI value; Choose from Normal, Overweight, Obesity or Underweight. \n"
                 self.valid = False
 
             # check Income is float
-
-            if re.match(r'\d[0-9]{2,3}', person[5]):
-                print(person[5])
-            else:
-                print(person[5] + " " + 'is incorrect income, '
-                                        'must be a interger number')
+            try:
+                if int(person[5]):
+                    if len(str(int(person[5]))) > 3:
+                        feedback += "Income is too large."
+                        self.valid = False
+                    else:
+                        pass
+                else:
+                    feedback += "Incorrect income; must be an integer number. \n" + str(person[5])
+                    self.valid = False
+            except ValueError:
                 self.valid = False
-
-            # check birthday
-            if self.valid_date(person[6]) and person[2] == self.valid_age(person[6]):
-                print(person[6])
-            else:
-                print(person[2] + " " + 'is incorrect date format, '
-                                        'must contain DD-MM-YYYY or DD-MM-YY and seperated by -')
-                # self.valid = False
 
             if self.valid:
                 add_to.append(person)
-            
+                feedback += "Passed and added to database.\n"
+            else:
+                feedback += '\n\n'
+
+        print(feedback)
         return add_to
 
     # Brendan Holt
